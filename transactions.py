@@ -1,36 +1,80 @@
-import os
 import gspread
+import csv
+import json
+import os
 from dotenv import load_dotenv
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-chromedriver = "/chromedriver"
-option = webdriver.ChromeOptions()
-option.binary_location = '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser'
-s = Service(chromedriver)
-driver = webdriver.Chrome(service=s, options=option)
-wait = WebDriverWait(driver, 20)
 
 load_dotenv()
-USERNAME = os.environ.get("USERNAME")
-PASSWORD = os.environ.get("PASSWORD")
+PATH = "csv6407.csv" #TODO: change this to taking argv[1] instead
 
-driver.get("https://secure.royalbank.com/statics/login-service-ui/index#/full/signin?LANGUAGE=ENGLISH")
-wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="userName"]')))
-driver.find_element(By.XPATH, '//*[@id="userName"]').send_keys(USERNAME)
-driver.find_element(By.XPATH, '//a[@id="signinNext"]').click()
-driver.find_element(By.XPATH, '//*[@id="password"]').send_keys(PASSWORD)
-driver.find_element(By.XPATH, '//*[@id="signinNext"]').click()
-#TODO: need to program a wait so it waits for 2 step verification
-#TODO: goes into visa card section and scrape authorized transactions
-#TODO: compare transactions, not sure if this should be in here
-'''
-if same amount
-    if same date, don't record cuz it's possibly a pending transaction
-else record everything
-'''
+with open('accounts.json') as f:
+    accounts = json.load(f)
 
-driver.quit()
+path = f"{PATH}"
+transactions = []
+markets = ['HMART', 'METRO', 'WHOLE FOODS', 'T&T', 'SHOPPERS']
+foodDelivery = ['DOORDASH', 'EATS']
+transits = ['PRESTO', 'TRIP']
+subscriptions = ['']
+credit_cards = ['Visa', 'MasterCard', 'Amex']
+
+
+def getTransactionData(path, markets=markets, foodDelivery=foodDelivery, transits=transits):
+    try:
+        with open(path, mode='r') as csv_file:
+            csv_reader = csv.reader(csv_file)
+            header = next(csv_reader)
+            res = 1
+            try:
+                for row in csv_reader:
+                    type = ''
+                    card_used = ''
+                    date = row[2]
+                    desc = row[4]
+                    amount = row[6]
+                    category = 'Misc'
+                    if row[0] in credit_cards:
+                        type = 'Credit Card'
+                    if row[1] in accounts[type]:
+                        card_used = accounts[type][str(row[1])]
+                    while res == 1:
+                        for market in markets:
+                            if market in desc:
+                                category = 'Groceries'
+                                res = 0
+                                break
+                        for foodDel in foodDelivery:
+                            if foodDel in desc:
+                                category = 'Food Delivery'
+                                res = 0
+                                break
+                        for transit in transits:
+                            if transit in desc:
+                                category = 'Transportation'
+                                res = 0
+                                break
+                        if 'FEE' in desc:
+                            category = 'Fee'
+                            break
+                        if 'FREEDOM MOBILE' in desc:
+                            category = 'Phone Bill'
+                            break
+                        if 'PAYMENT' in desc:
+                            category = 'Payment'
+                            break
+                        break
+                    res = 1
+                    transaction = ((date, desc, category, amount, type, card_used))
+                    print(transaction)
+                    transactions.append(transaction)
+                return transactions
+            except:
+                print("Fail to extract data from csv file.")
+    except:
+        print("CSV file cannot be opened.")
+
+# gc = gspread.service_account()
+# sh = gc.open("Transactions sheet")
+# wks = sh.worksheet()
+
+rows = getTransactionData(path)
