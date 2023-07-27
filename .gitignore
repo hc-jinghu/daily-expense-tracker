@@ -129,7 +129,7 @@ dmypy.json
 cython_debug/
 
 # .csv
-.csv
+*.csv
 
 # JSON files
 accounts.json
