@@ -1,3 +1,5 @@
 {
-    "account no.1" : "account 1"
+    "type" : {
+        "account no.1" : "account 1"
+    }
 }

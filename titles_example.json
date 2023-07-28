@@ -1,0 +1,21 @@
+{
+    "category_names" : [
+        "Payment", "Fee", "Groceries", "Food Delivery", "Transport", 
+        "Bill", "Subscription"
+    ],
+    "grocery_names" : [
+        "Hmart", "Metro", "Whole Foods", "T&T", "Shoppers", "Loblaws"
+    ],
+    "food_deli_names" : [
+        "DoorDash", "Uber Eats"
+    ],
+    "transport_names" : [
+        "Presto Card", "Uber Rides"
+    ],
+    "bill_names" : [
+        "Freedom Mobile"
+    ],
+    "sub_names" : [
+        "Youtube Premium"
+    ]
+}
