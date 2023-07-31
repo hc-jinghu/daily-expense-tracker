@@ -8,7 +8,7 @@ import category as cat
 from time import sleep
 import importcsv
 
-# Inserting data
+# Insert data
 with open('accounts.json') as f:
     accounts = json.load(f)
 with open('titles.json') as f:
@@ -42,7 +42,7 @@ def getTransactionDate(file, credit_cards=credit_cards):
     try:
         with open(file, mode='r') as csvf:
             reader = csv.reader(csvf)
-            header = next(reader)
+            next(reader)
             for row in reader:
                 try:
                     type = 'other'
@@ -53,21 +53,21 @@ def getTransactionDate(file, credit_cards=credit_cards):
                     category = 'Miscellaneous'
                     if row[0] in credit_cards:
                         type = 'Credit Card'
-                    if row[1] in accounts[type]:
-                        card_used = accounts[type][row[1]]
-                    # Set category and desc
-                    for keyword in keyword_dict:
-                        if keyword in desc:
-                            category = keyword_dict[keyword].getCategory()
-                            desc = keyword_dict[keyword].getVendor()
-                    if 'FEE' in desc:
-                        desc = 'Annual Fee'
-                        type = 'Annual Fee'
-                    # Record transaction
-                    if category != 'Payment':
-                        transaction = ((date, desc, category, amount, type, card_used))
-                        print(transaction)
-                    transactions.append(transaction)
+                        if row[1] in accounts[type]:
+                            card_used = accounts[type][row[1]]
+                        # Set category and desc
+                        for keyword in keyword_dict:
+                            if keyword in desc:
+                                category = keyword_dict[keyword].getCategory()
+                                desc = keyword_dict[keyword].getVendor()
+                        if 'FEE' in desc:
+                            desc = 'Annual Fee'
+                            type = 'Annual Fee'
+                        # Record transaction
+                        if category != 'Payment':
+                            transaction = ((date, desc, category, amount, type, card_used))
+                            print(transaction)
+                            transactions.append(transaction)
                 except:
                     print("Error: Unable to extract data from csv file.")
         return transactions
@@ -75,13 +75,16 @@ def getTransactionDate(file, credit_cards=credit_cards):
         print("Error: Can't locate/open csv file.")
         
 
-gc = gspread.service_account()
-sh = gc.open("Transactions sheet test")
-wks = sh.worksheet("Sheet1")
+# gc = gspread.service_account()
+# sh = gc.open("Transactions sheet test")
+# wks = sh.worksheet("Sheet1")
+
+# file = loadcsv()
+# rows = getTransactionDate(file)
+# if rows is not None:
+#     for row in rows:
+#         wks.insert_row(row, 2)
+#         sleep(2)
 
 file = loadcsv()
-rows = getTransactionDate(file)
-if rows is not None:
-    for row in rows:
-        wks.insert_row(row, 2)
-        sleep(2)
+getTransactionDate(file)
