@@ -129,6 +129,7 @@ dmypy.json
 cython_debug/
 
 # .csv
+csvfolder/
 *.csv
 
 # personal files

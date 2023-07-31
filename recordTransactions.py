@@ -1,11 +1,14 @@
 import csv
 import json
 import sys
+import os
+from dotenv import load_dotenv
 import gspread
 import category as cat
 from time import sleep
+import importcsv
 
-file = f"{sys.argv[1]}.csv"
+# Inserting data
 with open('accounts.json') as f:
     accounts = json.load(f)
 with open('titles.json') as f:
@@ -13,10 +16,11 @@ with open('titles.json') as f:
 key_cats = list(titles.keys())
 with open('keywords.json') as f:
     keyword_list = json.load(f)
-
 transactions = []
 credit_cards = ('Visa', 'MasterCard', 'Amex')
-NUMOFCAT = 6
+NUMOFCAT = 0
+for name in titles[key_cats[0]]:
+    NUMOFCAT += 1
 categories = []
 for i in range(0, NUMOFCAT-1):
     for name in titles[key_cats[i+1]]:
@@ -26,6 +30,13 @@ i = 0
 for keyword in keyword_list:
     keyword_dict.update({keyword : categories[i]})
     i += 1
+
+def loadcsv():
+    importcsv
+    load_dotenv()
+    PATH = os.environ.get("CSVFOLDER")
+    file = PATH + f"/{sys.argv[1]}.csv"
+    return file
 
 def getTransactionDate(file, credit_cards=credit_cards):
     try:
@@ -65,8 +76,10 @@ def getTransactionDate(file, credit_cards=credit_cards):
         
 
 gc = gspread.service_account()
-sh = gc.open("Transactions sheet")
+sh = gc.open("Transactions sheet test")
 wks = sh.worksheet("Sheet1")
+
+file = loadcsv()
 rows = getTransactionDate(file)
 if rows is not None:
     for row in rows:
