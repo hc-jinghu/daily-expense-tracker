@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import gspread
 import category as cat
 from time import sleep
-import importcsv
+from importcsv import importcsv
 
 # Link to google sheet
 gc = gspread.service_account()
@@ -38,11 +38,14 @@ for keyword in keyword_list:
     i += 1
 
 def loadcsv():
-    importcsv
+    importcsv()
     load_dotenv()
     PATH = os.environ.get("CSVFOLDER")
-    file = PATH + f"/{sys.argv[1]}.csv"
-    return file
+    try:
+        file = PATH + f"/{sys.argv[1]}.csv"
+        return file
+    except:
+        print("Please provide csv file name.")
 
 def getTransactionDate(file, credit_cards=credit_cards):
     try:
@@ -90,11 +93,13 @@ def getTransactionDate(file, credit_cards=credit_cards):
         print("Error: Can't locate/open csv file.")
 
 def main():
+    print("Starting Expension..")
     file = loadcsv()
     entries = getTransactionDate(file)
     if entries is not None:
         for entry in entries:
             wks.insert_row(entry, 27)
             sleep(2)
+    print("Exited Expension.")
 
 main()

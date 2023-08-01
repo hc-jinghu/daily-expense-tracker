@@ -136,3 +136,4 @@ csvfolder/
 accounts.json
 titles.json
 keywords.json
+*.sh
